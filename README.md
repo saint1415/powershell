@@ -1,6 +1,6 @@
 # Plex Migration Toolkit
 
-A Windows PowerShell GUI tool for backing up and migrating Plex Media Server data. Provides both command-line and graphical interfaces for creating reliable backups of your Plex configuration, databases, and metadata.
+A Windows PowerShell GUI tool for backing up and migrating Plex Media Server data. Provides a clean, modern interface for creating reliable backups of your Plex configuration, databases, and metadata.
 
 ![Plex Migration Toolkit Screenshot](screenshot.png)
 
@@ -44,7 +44,7 @@ A Windows PowerShell GUI tool for backing up and migrating Plex Media Server dat
 
 ### Download
 1. Download `plex_migration_gui.ps1` from the releases page
-2. Save to a folder like `C:\PlexBackup\`
+2. Save to a folder of your choice
 
 ### PowerShell Execution Policy
 If you get execution policy errors, run PowerShell as Administrator and execute:
@@ -54,7 +54,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## Usage
 
-### GUI Mode (Recommended)
 1. Right-click `plex_migration_gui.ps1` → **Run with PowerShell**
 2. Or open PowerShell and run: `.\plex_migration_gui.ps1`
 3. Select your destination drive from the dropdown
@@ -64,23 +63,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    - **Smart Sync**: Best of both worlds
 5. Monitor progress in real-time
 6. Check completion status and backup size
-
-### Command Line Mode
-The original script also supports command-line usage:
-
-```powershell
-# Interactive menu
-.\plex_migration.ps1
-
-# Direct hot copy to G: drive
-.\plex_migration.ps1 -Drive G: -HotCopy
-
-# Direct cold copy to G: drive  
-.\plex_migration.ps1 -Drive G: -ColdCopy
-
-# List available drives
-.\plex_migration.ps1 -ListDrives
-```
 
 ## Backup Strategy Recommendations
 
@@ -104,10 +86,10 @@ The original script also supports command-line usage:
 ### Step 1: Create Backup
 1. Run the tool on your current Plex server
 2. Use **Cold Copy** for most reliable backup
-3. Note the backup location (e.g., `G:\Plex Media Server`)
+3. Note the backup location
 
 ### Step 2: Transfer to New System
-1. Copy the entire backup folder to your new Windows 11 machine
+1. Copy the entire backup folder to your new machine
 2. Install Plex Media Server on the new system but don't set it up
 3. Stop the Plex service: `Stop-Service PlexService`
 
@@ -163,44 +145,9 @@ Plex Media Server/
 └── Cache/                # Temporary files (excluded)
 ```
 
-## Contributing
-
-Contributions welcome! Please feel free to:
-- Report bugs or issues
-- Suggest new features
-- Submit pull requests
-- Improve documentation
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Disclaimer
 
 - Always test backups before relying on them
 - This tool is not affiliated with Plex Inc.
 - Use at your own risk - always maintain multiple backups
 - Verify restored data before deleting original server
-
-## Changelog
-
-### v2.0.0 - GUI Version
-- Added modern Windows Forms GUI interface (`plex_migration_gui.ps1`)
-- Real-time progress monitoring
-- Automatic drive detection
-- Visual status indicators
-- Improved error handling
-
-### v1.0.0 - Original Script
-- Command-line interface (`plex_migration.ps1`)
-- Hot/Cold/Smart copy modes
-- Basic progress indication
-- Robocopy integration
-
----
-
-**Need Help?** Open an issue on GitHub with:
-- Your Windows version
-- PowerShell version (`$PSVersionTable.PSVersion`)
-- Error messages or screenshots
-- Steps to reproduce the problem
