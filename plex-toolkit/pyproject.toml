@@ -1,0 +1,112 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plex-migration-toolkit"
+version = "2.0.0"
+description = "Cross-platform backup and migration tool for Plex Media Server"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "saint1415"}
+]
+keywords = [
+    "plex",
+    "backup",
+    "migration",
+    "media-server",
+    "cross-platform"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: X11 Applications",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Archiving :: Backup",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "psutil>=5.9.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+gui = [
+    "tkinter-tooltip>=2.0.0",
+]
+network = [
+    "zeroconf>=0.80.0",
+    "netifaces>=0.11.0",
+]
+ssh = [
+    "paramiko>=3.4.0",
+    "scp>=0.14.0",
+]
+compression = [
+    "py7zr>=0.20.0",
+]
+cli = [
+    "rich>=13.0.0",
+    "tqdm>=4.65.0",
+]
+all = [
+    "plex-migration-toolkit[gui,network,ssh,compression,cli]",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pyinstaller>=6.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/saint1415/powershell"
+Documentation = "https://github.com/saint1415/powershell/blob/main/plex-toolkit/README.md"
+Repository = "https://github.com/saint1415/powershell.git"
+Issues = "https://github.com/saint1415/powershell/issues"
+
+[project.scripts]
+plex-toolkit = "cli.main:main"
+
+[project.gui-scripts]
+plex-toolkit-gui = "gui.main_window:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.yml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

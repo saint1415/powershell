@@ -1,0 +1,45 @@
+# Plex Migration Toolkit Dependencies
+# Cross-platform Plex backup and migration tool
+
+# GUI Framework
+tkinter-tooltip>=2.0.0  # Enhanced tooltips for tkinter
+
+# Network Discovery
+zeroconf>=0.80.0  # mDNS/DNS-SD for network discovery
+netifaces>=0.11.0  # Network interface information
+
+# HTTP/API
+requests>=2.31.0  # HTTP requests for Plex API
+urllib3>=2.0.0  # URL handling
+
+# Compression
+py7zr>=0.20.0  # 7-Zip compression support
+
+# System utilities
+psutil>=5.9.0  # Process and system utilities
+watchdog>=3.0.0  # File system monitoring
+
+# SSH/Remote operations
+paramiko>=3.4.0  # SSH2 protocol library
+scp>=0.14.0  # SCP file transfer
+
+# Database handling
+# sqlite3 is built-in
+
+# Progress bars for CLI
+tqdm>=4.65.0  # Progress bars
+rich>=13.0.0  # Rich terminal output
+
+# Configuration
+pyyaml>=6.0  # YAML configuration files
+python-dotenv>=1.0.0  # Environment variables
+
+# Packaging/Distribution
+pyinstaller>=6.0.0  # Create standalone executables
+
+# Windows-specific (optional)
+pywin32>=306; sys_platform == 'win32'  # Windows API access
+
+# Testing
+pytest>=7.4.0  # Testing framework
+pytest-cov>=4.1.0  # Coverage reporting

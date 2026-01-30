@@ -1,153 +1,141 @@
 # Plex Migration Toolkit
 
-A Windows PowerShell GUI tool for backing up and migrating Plex Media Server data. Provides a clean, modern interface for creating reliable backups of your Plex configuration, databases, and metadata.
+A powerful, cross-platform tool for backing up and migrating Plex Media Server data between machines and operating systems.
 
-![Plex Migration Toolkit Screenshot](screenshot.png)
+![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## Features
+## Overview
 
-### 🖥️ Modern GUI Interface
-- Clean, dark-themed Windows Forms interface
-- Real-time progress monitoring with visual progress bars
-- Live status updates showing Plex service state and data location
-- Automatic drive detection with space information
-- One-click backup operations
+This repository contains two versions of the Plex Migration Toolkit:
 
-### ⚡ Multiple Copy Modes
-- **Hot Copy**: Backup while Plex is running (faster start, good for initial backups)
-- **Cold Copy**: Stop Plex temporarily for most reliable backup
-- **Smart Sync**: Combines hot copy followed by cold differential sync
+### 1. Plex Migration Toolkit (Cross-Platform Python) - **Recommended**
 
-### 🔧 Smart Features
-- **Differential backups**: Only copies changed files on subsequent runs
-- **Automatic Plex service management**: Safely stops and restarts Plex when needed
-- **Existing backup detection**: Shows if backups already exist on target drives
-- **Detailed logging**: Full robocopy logs saved to destination drive
-- **Progress estimation**: Time-based progress updates during long operations
+Located in the [`plex-toolkit/`](plex-toolkit/) directory.
 
-### 📁 What Gets Backed Up
-- Plex databases (libraries, watch history, ratings)
-- Metadata and artwork cache
-- Plugin configurations and data
-- User preferences and settings
-- **Excludes**: Temporary transcoding files and cache data
+A complete rewrite in Python with:
+- **Cross-platform support** - Windows, Linux, macOS, and NAS devices
+- **Modern GUI** - Dark-themed tkinter interface
+- **Full CLI** - Automation and scripting support
+- **Network Migration** - Auto-discovery and direct transfer between machines
+- **Cross-OS Migration** - Automatic path remapping for Windows↔Linux↔macOS
+- **Multiple backup modes** - Hot, Cold, Smart Sync, Incremental
+- **Compression** - ZIP, TAR.GZ, TAR.XZ, 7-Zip
+- **NAS Support** - Synology, QNAP, Unraid, TrueNAS
 
-## Requirements
+See [`plex-toolkit/README.md`](plex-toolkit/README.md) for full documentation.
 
-- Windows 10/11
-- PowerShell 5.0 or later
-- Plex Media Server installed
-- Additional drive for backup storage
-- Administrator privileges (recommended)
+#### Quick Start (Python)
 
-## Installation
+```bash
+# Clone the repository
+git clone https://github.com/saint1415/powershell.git
+cd powershell/plex-toolkit
 
-### Download
-1. Download `plex_migration_gui.ps1` from the releases page
-2. Save to a folder of your choice
+# Install dependencies
+pip install -r requirements.txt
 
-### PowerShell Execution Policy
-If you get execution policy errors, run PowerShell as Administrator and execute:
+# Launch GUI
+python plex_toolkit.py
+
+# Or use CLI
+python plex_toolkit.py --cli backup /path/to/backup
+```
+
+### 2. Original PowerShell GUI (Windows Only)
+
+The original Windows PowerShell version with Windows Forms GUI.
+
+- Simple, single-file script
+- Windows-only
+- Hot Copy, Cold Copy, Smart Sync modes
+- Perfect for quick Windows-to-Windows backups
+
+#### Quick Start (PowerShell)
+
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+# Download and run
+.\plex_migration_gui.ps1
 ```
 
-## Usage
+## Downloads
 
-1. Right-click `plex_migration_gui.ps1` → **Run with PowerShell**
-2. Or open PowerShell and run: `.\plex_migration_gui.ps1`
-3. Select your destination drive from the dropdown
-4. Choose your backup method:
-   - **Hot Copy**: For quick daily backups
-   - **Cold Copy**: For most reliable weekly backups  
-   - **Smart Sync**: Best of both worlds
-5. Monitor progress in real-time
-6. Check completion status and backup size
+### Pre-built Releases
 
-## Backup Strategy Recommendations
+Download ready-to-use packages from the [Releases](https://github.com/saint1415/powershell/releases) page:
 
-### First-Time Backup
-1. Use **Cold Copy** for the most reliable initial backup
-2. Allow 30-60 minutes depending on library size
-3. Verify backup completed successfully
+| Platform | File | Description |
+|----------|------|-------------|
+| Windows | `plex-toolkit.exe` | Standalone executable |
+| Windows | `plex-toolkit-*-windows-portable.zip` | Portable package |
+| Linux | `plex-toolkit-*-linux-amd64.deb` | Debian/Ubuntu package |
+| Linux | `plex-toolkit-*-linux-portable.tar.gz` | Portable package |
+| macOS | `plex-toolkit-*-macos.dmg` | macOS disk image |
+| macOS | `plex-toolkit-*-macos-portable.tar.gz` | Portable package |
 
-### Regular Backups
-1. Use **Hot Copy** for quick daily/weekly differential backups
-2. Takes only minutes if little has changed
-3. Use **Smart Sync** monthly for thorough synchronization
+## Features Comparison
 
-### Before Major Changes
-- Always backup before Plex updates
-- Backup before changing library locations
-- Backup before server migrations
+| Feature | Python Toolkit | PowerShell |
+|---------|---------------|------------|
+| Windows Support | Yes | Yes |
+| Linux Support | Yes | No |
+| macOS Support | Yes | No |
+| NAS Support | Yes | No |
+| GUI | Yes | Yes |
+| CLI | Yes | Limited |
+| Network Migration | Yes | No |
+| Cross-OS Migration | Yes | No |
+| Compression | Yes | No |
+| Incremental Backup | Yes | No |
+| Auto-discovery | Yes | No |
 
-## Migration to New System
+## Migration Scenarios
 
-### Step 1: Create Backup
-1. Run the tool on your current Plex server
-2. Use **Cold Copy** for most reliable backup
-3. Note the backup location
+### Local Backup
+1. Launch the toolkit
+2. Select destination drive
+3. Choose backup mode
+4. Click Start Backup
 
-### Step 2: Transfer to New System
-1. Copy the entire backup folder to your new machine
-2. Install Plex Media Server on the new system but don't set it up
-3. Stop the Plex service: `Stop-Service PlexService`
+### Windows to Linux Migration
+```bash
+# On Windows: Create backup
+python plex_toolkit.py --cli backup -m cold -c zip E:\backup
 
-### Step 3: Restore Data
-1. Navigate to `%LOCALAPPDATA%\Plex Media Server\`
-2. Delete the default empty folders
-3. Copy your backup contents to this location
-4. Start Plex service: `Start-Service PlexService`
-5. Open Plex - your libraries and settings should be intact
-
-## Troubleshooting
-
-### GUI Won't Start
-- Run from PowerShell ISE instead of regular PowerShell
-- Check execution policy: `Get-ExecutionPolicy`
-- Run as Administrator
-
-### "Plex Data: NOT FOUND"
-- Verify Plex is installed and has been run at least once
-- Check custom installation paths
-- Default location: `%LOCALAPPDATA%\Plex Media Server`
-
-### Copy Operation Fails
-- Ensure destination drive has sufficient free space
-- Check if Plex files are locked (try Cold Copy mode)
-- Review log file on destination drive for detailed errors
-- Verify permissions on both source and destination
-
-### Slow Performance
-- Hot Copy is faster but may miss locked files
-- Cold Copy is slower but most reliable
-- Use Smart Sync for best balance
-- Close other applications during backup
-
-## Technical Details
-
-### Backup Method
-- Uses Windows `robocopy` with mirror mode (`/MIR`)
-- Multi-threaded copying (`/MT:8`) for better performance
-- Automatic retry on locked files (`/R:3 /W:5`)
-- Excludes temporary and cache files
-
-### File Structure
-The tool backs up the entire `%LOCALAPPDATA%\Plex Media Server\` directory:
-```
-Plex Media Server/
-├── Plug-in Support/
-│   ├── Databases/          # Main Plex database
-│   ├── Data/              # Plugin data
-│   └── Preferences/       # User settings
-├── Media/                 # Metadata cache
-├── Metadata/             # Downloaded artwork
-└── Cache/                # Temporary files (excluded)
+# Copy to Linux, then restore with path remapping
+python3 plex_toolkit.py --cli restore /path/to/backup \
+    -r "D:\\Media" "/mnt/media"
 ```
 
-## Disclaimer
+### Network Migration
+1. Run toolkit on both machines
+2. Set roles (Source/Target)
+3. Auto-discovery finds both
+4. Click Start Migration
 
-- Always test backups before relying on them
-- This tool is not affiliated with Plex Inc.
-- Use at your own risk - always maintain multiple backups
-- Verify restored data before deleting original server
+## Documentation
+
+- [Full Python Toolkit Documentation](plex-toolkit/README.md)
+- [Building from Source](plex-toolkit/README.md#building-from-source)
+- [CLI Reference](plex-toolkit/README.md#cli-mode)
+
+## Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+## Support
+
+- **Issues:** [GitHub Issues](https://github.com/saint1415/powershell/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/saint1415/powershell/discussions)
+
+## License
+
+MIT License - See [LICENSE](plex-toolkit/LICENSE) for details.
+
+---
+
+**Note:** This tool is not affiliated with Plex Inc. Always maintain multiple backups.

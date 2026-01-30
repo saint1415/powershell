@@ -1,0 +1,196 @@
+name: Build Plex Migration Toolkit
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r plex-toolkit/requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable
+        working-directory: plex-toolkit
+        run: |
+          python -m PyInstaller --name plex-toolkit --onefile --windowed --add-data "src;src" plex_toolkit.py
+
+      - name: Create portable package
+        working-directory: plex-toolkit
+        run: |
+          $version = "2.0.0"
+          $pkg = "plex-toolkit-$version-windows-portable"
+          New-Item -ItemType Directory -Path "dist/$pkg" -Force
+          Copy-Item plex_toolkit.py "dist/$pkg/"
+          Copy-Item requirements.txt "dist/$pkg/"
+          Copy-Item README.md "dist/$pkg/"
+          Copy-Item -Recurse src "dist/$pkg/"
+          Compress-Archive -Path "dist/$pkg" -DestinationPath "dist/$pkg.zip"
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: |
+            plex-toolkit/dist/plex-toolkit.exe
+            plex-toolkit/dist/*-windows-portable.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r plex-toolkit/requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable
+        working-directory: plex-toolkit
+        run: |
+          python -m PyInstaller --name plex-toolkit --onefile --add-data "src:src" plex_toolkit.py
+
+      - name: Create portable package
+        working-directory: plex-toolkit
+        run: |
+          VERSION="2.0.0"
+          PKG="plex-toolkit-$VERSION-linux-portable"
+          mkdir -p "dist/$PKG"
+          cp plex_toolkit.py "dist/$PKG/"
+          cp requirements.txt "dist/$PKG/"
+          cp README.md "dist/$PKG/"
+          cp -r src "dist/$PKG/"
+          tar -czvf "dist/$PKG.tar.gz" -C dist "$PKG"
+
+      - name: Create DEB package
+        working-directory: plex-toolkit
+        run: |
+          VERSION="2.0.0"
+          PKG="plex-toolkit_${VERSION}_amd64"
+          mkdir -p "dist/$PKG/DEBIAN"
+          mkdir -p "dist/$PKG/usr/share/plex-toolkit"
+          mkdir -p "dist/$PKG/usr/bin"
+
+          # Control file
+          cat > "dist/$PKG/DEBIAN/control" << EOF
+          Package: plex-toolkit
+          Version: $VERSION
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: python3 (>= 3.8), python3-tk
+          Maintainer: saint1415
+          Description: Plex Migration Toolkit
+           Cross-platform backup and migration tool for Plex Media Server.
+          EOF
+
+          # Copy files
+          cp plex_toolkit.py "dist/$PKG/usr/share/plex-toolkit/"
+          cp requirements.txt "dist/$PKG/usr/share/plex-toolkit/"
+          cp -r src "dist/$PKG/usr/share/plex-toolkit/"
+
+          # Wrapper script
+          echo '#!/bin/bash' > "dist/$PKG/usr/bin/plex-toolkit"
+          echo 'python3 /usr/share/plex-toolkit/plex_toolkit.py "$@"' >> "dist/$PKG/usr/bin/plex-toolkit"
+          chmod +x "dist/$PKG/usr/bin/plex-toolkit"
+
+          # Build
+          dpkg-deb --build "dist/$PKG"
+          mv "dist/$PKG.deb" "dist/plex-toolkit-$VERSION-linux-amd64.deb"
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: |
+            plex-toolkit/dist/plex-toolkit
+            plex-toolkit/dist/*-linux-portable.tar.gz
+            plex-toolkit/dist/*-linux-amd64.deb
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r plex-toolkit/requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable
+        working-directory: plex-toolkit
+        run: |
+          python -m PyInstaller --name "Plex Migration Toolkit" --onedir --windowed --add-data "src:src" plex_toolkit.py
+
+      - name: Create portable package
+        working-directory: plex-toolkit
+        run: |
+          VERSION="2.0.0"
+          PKG="plex-toolkit-$VERSION-macos-portable"
+          mkdir -p "dist/$PKG"
+          cp plex_toolkit.py "dist/$PKG/"
+          cp requirements.txt "dist/$PKG/"
+          cp README.md "dist/$PKG/"
+          cp -r src "dist/$PKG/"
+          tar -czvf "dist/$PKG.tar.gz" -C dist "$PKG"
+
+      - name: Create DMG
+        working-directory: plex-toolkit
+        run: |
+          VERSION="2.0.0"
+          hdiutil create -volname "Plex Migration Toolkit" -srcfolder "dist/Plex Migration Toolkit.app" -ov -format UDZO "dist/plex-toolkit-$VERSION-macos.dmg" || true
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: |
+            plex-toolkit/dist/*.app
+            plex-toolkit/dist/*-macos-portable.tar.gz
+            plex-toolkit/dist/*-macos.dmg
+
+  release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            windows-build/*
+            linux-build/*
+            macos-build/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
