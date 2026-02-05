@@ -1,0 +1,33 @@
+# Secrets & Credentials
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+secrets/
+credentials/
+*credentials*.ps1
+*secrets*.ps1
+
+# PowerShell
+*.psd1.local
+*.psm1.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Output
+output/
+exports/
